@@ -39,7 +39,7 @@ const Home: NextPage = () => {
   const [palette, setPalette] = useState<string[]>([]);
   const [animal, setAnimal] = useState<string>("");
   const [animalAdjective, setAnimalAdjective] = useState<string>("");
-  const [animalImage, setAnimalImage] = useState<string>(null);
+  const [animalImage, setAnimalImage] = useState(null);
 
 
   useEffect(() => {
