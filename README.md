@@ -4,4 +4,6 @@
 
 A fun Next.JS app for genearting cute painting or coloring prompts.
 
+Available at palart.jordantwells.com
+
 (if you try really hard, and in a very bad British accent, you can make PalArt sound like Palette, hence the name...)
