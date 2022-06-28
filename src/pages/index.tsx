@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import animalsJSON from "../../public/animals.json";
 import adjectivesJSON from "../../public/animal_adjectives.json";
@@ -23,23 +24,41 @@ function determineTextColor(hex: string) {
 
 function getAnimal(){
   const animal = animalsJSON[Math.floor(Math.random() * animalsJSON.length)];
-  const adjective = adjectivesJSON[Math.floor(Math.random() * adjectivesJSON.length)];
-  return `${adjective} ${animal}`;
+  return `${animal}`;
 }
+
+function getAnimalAdjective(){
+  const adjective = adjectivesJSON[Math.floor(Math.random() * adjectivesJSON.length)];
+  return `${adjective}`;
+}
+
+
+
 
 const Home: NextPage = () => {
   const [palette, setPalette] = useState<string[]>([]);
+  const [animal, setAnimal] = useState<string>("");
+  const [animalAdjective, setAnimalAdjective] = useState<string>("");
+  const [animalImage, setAnimalImage] = useState<string>(null);
+
+
   useEffect(() => {
-    refreshPalette()
+    refresh()
   }, []);
+
+
+  const refreshAnimal = () => {
+    const animal = getAnimal();
+    setAnimal(animal);
+    setAnimalAdjective(getAnimalAdjective());
+    setAnimalImage(getAnimalImageFromUnsplash(animal));
+  }
 
   const refreshPalette = () => {
     const url = `https://www.colr.org/json/scheme/random?query&scheme_size_limit=5&timestamp=${new Date().getTime()}`;
-    console.log(url)
     fetch(url)
     .then((res) => {
       const json = res.json();
-      console.log(json)
       return json
     })
     .then((data) => {
@@ -48,6 +67,29 @@ const Home: NextPage = () => {
     .catch(() => {
       refreshPalette()
     })
+  }
+  
+  const refresh = () => {
+    refreshAnimal();
+    refreshPalette();
+  }
+  
+  function getAnimalImageFromUnsplash(animal: string){
+    const url =  `https://api.unsplash.com/search/photos/random?query=${animal}&client_id=${process.env.NEXT_PUBLIC_UNSPLASH_API_KEY}`;
+    
+    fetch(url)
+    .then((res) => {
+      console.log(res)
+      const json = res.json();
+      console.log(json)
+      return json
+    }).then((data) => {
+      const image = data.results[0].urls.regular;
+      console.log(image)
+      setAnimalImage(image);
+      return image
+    })
+      
   }
 
   return (
@@ -74,10 +116,11 @@ const Home: NextPage = () => {
         <div className="py-3"></div>
 
         <div className="flex flex-row justify-center items-center">
-          <h2 className="text-center capitalize bold text-white text-3xl">A {getAnimal()}</h2>
+          <h2 className="text-center capitalize bold text-white text-3xl">A {animalAdjective} {animal}</h2>
         </div>
+        {animalImage && <Image src={animalImage} layout="fill" alt={"lmao"}></Image>}
         <div className="py-3"></div>
-        <div className="flex justify-center items-center h-auto py-3 w-full"><button className="border p-2 rounded text-white text=5xl text-center" onClick={refreshPalette}>Refresh</button></div>
+        <div onClick={refresh} className="flex justify-center items-center h-auto py-3 w-full"><button className="border p-2 rounded text-white text=5xl text-center">Refresh</button></div>
       </div>
 
     </>
